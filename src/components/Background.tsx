@@ -14,66 +14,57 @@ export const Background: React.FC = () => {
   const { fps } = useVideoConfig();
   const chapter = getCurrentChapter(frame, fps);
 
-  // Smooth subtle slow pan / zoom
-  const loopFrames = fps * 30; // 30s cycle
-  const scale = interpolate(frame % loopFrames, [0, loopFrames], [1.0, 1.08]);
+  // Dynamic slow cinematic pan / zoom cycle
+  const loopFrames = fps * 20; // 20s cycle
+  const scale = interpolate(frame % loopFrames, [0, loopFrames], [1.0, 1.07]);
+
+  const getBackgroundImage = () => {
+    switch (chapter.id) {
+      case 's01_hook':
+      case 's02_hit_wall':
+      case 's03_obvious_plan':
+        return 'hero_ai_phone.jpg';
+
+      case 's04_misleading_apis':
+      case 's05_forbidden_permission':
+      case 's06_accessibility_door':
+      case 's07_default_monopoly':
+        return 'android_security.jpg';
+
+      case 's08_trai_regulations':
+      case 's09_three_boundaries':
+        return 'telecom_dlt.jpg';
+
+      case 's10_cloud_pivot':
+      case 's11_exotel_stream':
+      case 's12_duplex_voicebot':
+      case 's13_streaming_stt':
+      case 's14_llm_reasoning':
+      case 's15_tts_orchestration':
+      case 's16_latency_gap':
+      case 's17_barge_in':
+        return 'cloud_telephony.jpg';
+
+      case 's18_anti_ivr':
+      case 's19_app_functions':
+      case 's20_mcp_tools':
+      case 's21_the_verdict':
+      case 's22_send_prompt_outro':
+      default:
+        return 'agent_future.jpg';
+    }
+  };
+
+  const currentBg = getBackgroundImage();
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#070a12', overflow: 'hidden' }}>
-      {/* Background visual switching based on chapter */}
-      {chapter.id === 'hook' && (
-        <AbsoluteFill style={{ opacity: 0.35, transform: `scale(${scale})` }}>
-          <Img
-            src={staticFile('hero_ai_phone.jpg')}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </AbsoluteFill>
-      )}
-
-      {chapter.id === 'android_wall' && (
-        <AbsoluteFill style={{ opacity: 0.32, transform: `scale(${scale})` }}>
-          <Img
-            src={staticFile('android_security.jpg')}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </AbsoluteFill>
-      )}
-
-      {chapter.id === 'regulations' && (
-        <AbsoluteFill style={{ opacity: 0.36, transform: `scale(${scale})` }}>
-          <Img
-            src={staticFile('telecom_dlt.jpg')}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </AbsoluteFill>
-      )}
-
-      {chapter.id === 'cloud_telephony' && (
-        <AbsoluteFill style={{ opacity: 0.36, transform: `scale(${scale})` }}>
-          <Img
-            src={staticFile('cloud_telephony.jpg')}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </AbsoluteFill>
-      )}
-
-      {(chapter.id === 'pipeline' || chapter.id === 'challenges') && (
-        <AbsoluteFill style={{ opacity: 0.35, transform: `scale(${scale})` }}>
-          <Img
-            src={staticFile('cloud_telephony.jpg')}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </AbsoluteFill>
-      )}
-
-      {(chapter.id === 'app_functions' || chapter.id === 'outro') && (
-        <AbsoluteFill style={{ opacity: 0.38, transform: `scale(${scale})` }}>
-          <Img
-            src={staticFile('agent_future.jpg')}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </AbsoluteFill>
-      )}
+      <AbsoluteFill style={{ opacity: 0.35, transform: `scale(${scale})` }}>
+        <Img
+          src={staticFile(currentBg)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      </AbsoluteFill>
 
       {/* Cyberpunk Grid Overlay */}
       <div
