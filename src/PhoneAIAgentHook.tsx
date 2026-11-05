@@ -6,11 +6,12 @@ import { PhoneHUD } from './components/PhoneHUD';
 import { SubtitlesOverlay } from './components/SubtitlesOverlay';
 import { FooterTicker } from './components/FooterTicker';
 import { SoundEffects } from './components/SoundEffects';
+import { ViralHookOverlay } from './components/ViralHookOverlay';
 
 export const PhoneAIAgentHook: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: '#070a12', overflow: 'hidden' }}>
-      {/* Voiceover Track (starts at 0) */}
+      {/* Voiceover Track */}
       <Audio src={staticFile('voiceover.mp3')} volume={1.0} />
 
       {/* Layered Sound Effects & Music */}
@@ -18,6 +19,9 @@ export const PhoneAIAgentHook: React.FC = () => {
 
       {/* Dynamic Background */}
       <Background />
+
+      {/* 3-Second Sound-Off Hook Headline Overlay */}
+      <ViralHookOverlay />
 
       {/* Top Header */}
       <ProgressBar />

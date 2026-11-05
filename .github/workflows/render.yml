@@ -1,46 +1,68 @@
-name: Build & Render Remotion Reel
+name: Build & Render 60FPS Remotion Reel (Cloud)
 
 on:
   workflow_dispatch:
     inputs:
-      composition:
-        description: 'Remotion Composition to render'
+      mode:
+        description: 'Rendering Strategy'
         required: true
-        default: 'PhoneAIAgentHook'
+        default: 'parallel-cluster'
         type: choice
         options:
-          - PhoneAIAgentHook
-          - PhoneAIAgentReel
-      concurrency:
-        description: 'CPU render concurrency'
-        required: false
-        default: '4'
-      frames:
-        description: 'Specific frame range (e.g. 0-300) or empty for full composition'
-        required: false
-        default: ''
+          - parallel-cluster
+          - single-runner
+          - hook-only
+      runner:
+        description: 'GitHub Runner Environment'
+        required: true
+        default: 'ubuntu-latest'
+        type: choice
+        options:
+          - ubuntu-latest
+          - ubuntu-latest-8-cores
+          - ubuntu-latest-16-cores
+          - self-hosted
   push:
     branches:
-      - master
       - main
+      - master
 
 jobs:
-  render:
-    name: Render Reel on Cloud Runner
-    runs-on: ubuntu-latest
+  # ============================================================================
+  # 1. PARALLEL CLUSTER: 4x Cloud Runners in Parallel (Full 6m30s @ 60 FPS)
+  # ============================================================================
+  render-chunk:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'parallel-cluster'
+    name: Render Chunk ${{ matrix.chunk }} (Frames ${{ matrix.start }}-${{ matrix.end }})
+    runs-on: ${{ github.event.inputs.runner }}
+    strategy:
+      matrix:
+        include:
+          - chunk: 0
+            start: 0
+            end: 5850
+          - chunk: 1
+            start: 5851
+            end: 11700
+          - chunk: 2
+            start: 11701
+            end: 17550
+          - chunk: 3
+            start: 17551
+            end: 23401
     timeout-minutes: 120
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20 LTS
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: Install System Dependencies for Remotion & Chromium
+      - name: Install System Graphics & Media Libraries
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -60,39 +82,172 @@ jobs:
             libgbm1 \
             libasound2t64 || sudo apt-get install -y libasound2
 
-      - name: Install NPM dependencies
+      - name: Install Project Dependencies
         run: npm ci
 
-      - name: Verify TypeScript compilation
+      - name: Verify TypeScript
         run: npx tsc --noEmit
 
-      - name: Determine Render Configuration
-        id: config
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "COMPOSITION=${{ github.event.inputs.composition }}" >> $GITHUB_ENV
-            echo "CONCURRENCY=${{ github.event.inputs.concurrency }}" >> $GITHUB_ENV
-            if [ -n "${{ github.event.inputs.frames }}" ]; then
-              echo "FRAMES_ARG=--frames=${{ github.event.inputs.frames }}" >> $GITHUB_ENV
-            else
-              echo "FRAMES_ARG=" >> $GITHUB_ENV
-            fi
-          else
-            # Default for push triggers: render the 60s viral hook reel
-            echo "COMPOSITION=PhoneAIAgentHook" >> $GITHUB_ENV
-            echo "CONCURRENCY=4" >> $GITHUB_ENV
-            echo "FRAMES_ARG=" >> $GITHUB_ENV
-          fi
-
-      - name: Render Remotion Video
+      - name: Render Chunk ${{ matrix.chunk }}
         run: |
           mkdir -p out
-          echo "Rendering $COMPOSITION on GitHub Cloud Runner..."
-          npx remotion render src/index.ts "$COMPOSITION" "out/${COMPOSITION}.mp4" --concurrency="$CONCURRENCY" $FRAMES_ARG
+          echo "Rendering Chunk ${{ matrix.chunk }} (${{ matrix.start }} - ${{ matrix.end }}) @ 60 FPS..."
+          npx remotion render src/index.ts PhoneAIAgentReel "out/chunk_${{ matrix.chunk }}.mp4" \
+            --frames="${{ matrix.start }}-${{ matrix.end }}" \
+            --concurrency=100% \
+            --jpeg-quality=85
 
-      - name: Upload Rendered Video Artifact
+      - name: Upload Chunk Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.COMPOSITION }}-rendered-video
+          name: video-chunk-${{ matrix.chunk }}
+          path: out/chunk_${{ matrix.chunk }}.mp4
+          retention-days: 7
+
+  # ============================================================================
+  # 2. STITCH CHUNKS: Combines the 4 chunks losslessly via FFmpeg
+  # ============================================================================
+  stitch-and-publish:
+    needs: render-chunk
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'parallel-cluster'
+    name: Stitch Chunks into Master 60FPS Reel
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Setup FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Download All Chunks
+        uses: actions/download-artifact@v4
+        with:
+          path: chunks
+
+      - name: Stitch Video Chunks
+        run: |
+          mkdir -p final_output
+          find chunks -type f -name "*.mp4" | sort
+
+          # Build concat file list in exact sequential order
+          cat <<EOF > concat_list.txt
+          file '$(pwd)/chunks/video-chunk-0/chunk_0.mp4'
+          file '$(pwd)/chunks/video-chunk-1/chunk_1.mp4'
+          file '$(pwd)/chunks/video-chunk-2/chunk_2.mp4'
+          file '$(pwd)/chunks/video-chunk-3/chunk_3.mp4'
+          EOF
+
+          cat concat_list.txt
+
+          echo "Stitching chunks losslessly with FFmpeg..."
+          ffmpeg -f concat -safe 0 -i concat_list.txt -c copy -y final_output/PhoneAIAgentReel_60FPS_MASTER.mp4
+
+          echo "Final video info:"
+          ffprobe final_output/PhoneAIAgentReel_60FPS_MASTER.mp4
+
+      - name: Publish Master 60FPS Reel
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhoneAIAgentReel-60FPS-MASTER
+          path: final_output/PhoneAIAgentReel_60FPS_MASTER.mp4
+          retention-days: 30
+
+  # ============================================================================
+  # 3. SINGLE RUNNER MODE: Full Composition on Single Cloud Runner
+  # ============================================================================
+  single-runner:
+    if: (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'single-runner') || github.event_name == 'push'
+    name: Single Runner (Full 60FPS Render)
+    runs-on: ${{ github.event.inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install System Graphics & Media Libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ffmpeg \
+            fonts-noto-color-emoji \
+            fonts-roboto \
+            fonts-freefont-ttf \
+            libnss3 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2t64 || sudo apt-get install -y libasound2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Verify TypeScript
+        run: npx tsc --noEmit
+
+      - name: Render Full 6m30s @ 60 FPS (23,402 Frames)
+        run: |
+          mkdir -p out
+          echo "Rendering complete master reel on cloud runner..."
+          npx remotion render src/index.ts PhoneAIAgentReel out/PhoneAIAgentReel_60FPS.mp4 \
+            --concurrency=100% \
+            --jpeg-quality=85
+
+      - name: Upload Master Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhoneAIAgentReel-60FPS
+          path: out/*.mp4
+          retention-days: 30
+
+  # ============================================================================
+  # 4. HOOK ONLY MODE: 60s Fast Viral Teaser @ 60 FPS (3,600 Frames)
+  # ============================================================================
+  hook-only:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'hook-only'
+    name: Render 60s Viral Hook @ 60 FPS
+    runs-on: ${{ github.event.inputs.runner || 'ubuntu-latest' }}
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install System Media Libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libnss3 libatk1.0-0 libasound2t64 || sudo apt-get install -y libasound2
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Render Hook Reel
+        run: |
+          mkdir -p out
+          npx remotion render src/index.ts PhoneAIAgentHook out/PhoneAIAgentHook_60FPS.mp4 \
+            --concurrency=100% \
+            --jpeg-quality=85
+
+      - name: Upload Hook Video
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhoneAIAgentHook-60FPS
           path: out/*.mp4
           retention-days: 30

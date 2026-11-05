@@ -6,6 +6,7 @@ import { PhoneHUD } from './components/PhoneHUD';
 import { SubtitlesOverlay } from './components/SubtitlesOverlay';
 import { FooterTicker } from './components/FooterTicker';
 import { SoundEffects } from './components/SoundEffects';
+import { ViralHookOverlay } from './components/ViralHookOverlay';
 
 export const PhoneAIAgentReel: React.FC = () => {
   return (
@@ -19,13 +20,16 @@ export const PhoneAIAgentReel: React.FC = () => {
       {/* Dynamic Cyberpunk Background with AI Imagery */}
       <Background />
 
+      {/* 3-Second Sound-Off Hook Headline Overlay */}
+      <ViralHookOverlay />
+
       {/* Top Progress & Chapter Bar */}
       <ProgressBar />
 
       {/* 3D Floating Phone Interface HUD */}
       <PhoneHUD />
 
-      {/* TikTok / Reels High-Energy Subtitles */}
+      {/* High-Energy Subtitles */}
       <SubtitlesOverlay />
 
       {/* Bottom Technical Ticker */}

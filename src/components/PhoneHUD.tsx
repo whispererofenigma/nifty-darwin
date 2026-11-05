@@ -1,19 +1,46 @@
 import React from 'react';
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import {
+  Activity,
+  AlertTriangle,
+  ArrowRight,
+  Bot,
+  Brain,
+  Calendar,
+  CheckCircle2,
+  Cloud,
+  Lock,
+  MessageCircle,
+  MessageSquareQuote,
+  Mic,
+  Network,
+  PhoneCall,
+  Radio,
+  Server,
+  Share2,
+  ShieldCheck,
+  Smartphone,
+  Timer,
+  Volume2,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { getCurrentChapter } from '../chapters';
 import { AudioVisualizer } from './AudioVisualizer';
 
 export const PhoneHUD: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const chapter = getCurrentChapter(frame);
+  const chapter = getCurrentChapter(frame, fps);
 
-  // Subtle floating oscillation
-  const translateY = Math.sin(frame * 0.04) * 8;
-  const rotateZ = Math.sin(frame * 0.02) * 0.8;
+  // Subtle floating oscillation (framerate normalized using seconds)
+  const currentSec = frame / fps;
+  const translateY = Math.sin(currentSec * 2.4) * 8;
+  const rotateZ = Math.sin(currentSec * 1.2) * 0.8;
 
   // Chapter transition spring
-  const chapterFrame = frame - chapter.startFrame;
+  const chapterStartFrame = Math.round(chapter.startSec * fps);
+  const chapterFrame = frame - chapterStartFrame;
   const enterSpring = spring({
     frame: chapterFrame,
     fps,
@@ -30,7 +57,7 @@ export const PhoneHUD: React.FC = () => {
         width: '560px',
         height: '840px',
         borderRadius: '52px',
-        backgroundColor: 'rgba(11, 16, 28, 0.85)',
+        backgroundColor: 'rgba(11, 16, 28, 0.88)',
         backdropFilter: 'blur(30px)',
         border: `2px solid ${chapter.accentColor}55`,
         boxShadow: `0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px ${chapter.accentColor}33`,
@@ -139,7 +166,7 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Glowing Avatar */}
+            {/* Glowing Avatar with Vector Bot Icon */}
             <div
               style={{
                 width: '150px',
@@ -162,10 +189,9 @@ export const PhoneHUD: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  flexDirection: 'column',
                 }}
               >
-                <div style={{ fontSize: '48px' }}>🤖</div>
+                <Bot size={64} color="#00f0ff" strokeWidth={2.2} />
               </div>
             </div>
 
@@ -174,7 +200,7 @@ export const PhoneHUD: React.FC = () => {
               <AudioVisualizer color="#00f0ff" barCount={28} height={60} />
             </div>
 
-            {/* Call Action Buttons */}
+            {/* Call Action Buttons with Vector Icons */}
             <div
               style={{
                 display: 'flex',
@@ -193,10 +219,9 @@ export const PhoneHUD: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 0 25px rgba(239, 68, 68, 0.5)',
-                  fontSize: '28px',
                 }}
               >
-                ✕
+                <X size={34} color="#ffffff" strokeWidth={3} />
               </div>
               <div
                 style={{
@@ -208,10 +233,9 @@ export const PhoneHUD: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   boxShadow: '0 0 25px rgba(16, 185, 129, 0.6)',
-                  fontSize: '28px',
                 }}
               >
-                📞
+                <PhoneCall size={34} color="#ffffff" strokeWidth={2.5} />
               </div>
             </div>
           </div>
@@ -251,7 +275,7 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Shield & Lock Graphic */}
+            {/* Shield & Lock Vector Graphic */}
             <div
               style={{
                 alignSelf: 'center',
@@ -264,10 +288,9 @@ export const PhoneHUD: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 boxShadow: '0 0 35px rgba(239, 68, 68, 0.4)',
-                fontSize: '56px',
               }}
             >
-              🔒
+              <Lock size={60} color="#ef4444" strokeWidth={2.4} />
             </div>
 
             {/* Terminal Log Cards */}
@@ -345,7 +368,7 @@ export const PhoneHUD: React.FC = () => {
                   marginBottom: '8px',
                 }}
               >
-                TRAI & Telecom Rules
+                TRAI &amp; Telecom Rules
               </div>
               <div
                 style={{
@@ -358,6 +381,7 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
+            {/* DLT Badge with Vector Shield Icon */}
             <div
               style={{
                 alignSelf: 'center',
@@ -370,7 +394,7 @@ export const PhoneHUD: React.FC = () => {
                 gap: '16px',
               }}
             >
-              <div style={{ fontSize: '38px' }}>🇮🇳</div>
+              <ShieldCheck size={38} color="#f59e0b" strokeWidth={2.4} />
               <div>
                 <div style={{ color: '#f59e0b', fontWeight: 800, fontSize: '18px' }}>
                   DLT REGISTRATION
@@ -434,7 +458,7 @@ export const PhoneHUD: React.FC = () => {
                   1600
                 </div>
                 <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: 700 }}>
-                  Service & Transactional Series
+                  Service &amp; Transactional Series
                 </div>
               </div>
 
@@ -447,9 +471,14 @@ export const PhoneHUD: React.FC = () => {
                   textAlign: 'center',
                   fontWeight: 700,
                   fontSize: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
                 }}
               >
-                ⚠️ Standard 10-digit SIM numbers are OUT
+                <AlertTriangle size={18} color="#f87171" />
+                <span>Standard 10-digit SIM numbers are OUT</span>
               </div>
             </div>
 
@@ -492,7 +521,7 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Cloud Call Forwarding Flow */}
+            {/* Cloud Call Forwarding Flow with Vector Icons */}
             <div
               style={{
                 display: 'flex',
@@ -504,21 +533,21 @@ export const PhoneHUD: React.FC = () => {
                 border: '1px solid #10b981',
               }}
             >
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '30px' }}>📱</div>
-                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700 }}>Owner SIM</div>
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Smartphone size={32} color="#10b981" />
+                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700, marginTop: '4px' }}>Owner SIM</div>
                 <div style={{ color: '#10b981', fontSize: '11px' }}>Forward Busy</div>
               </div>
-              <div style={{ color: '#10b981', fontSize: '24px', fontWeight: 900 }}>➔</div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '30px' }}>☁️</div>
-                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700 }}>Exotel Infra</div>
+              <ArrowRight size={22} color="#10b981" strokeWidth={2.5} />
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Cloud size={32} color="#10b981" />
+                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700, marginTop: '4px' }}>Exotel Infra</div>
                 <div style={{ color: '#10b981', fontSize: '11px' }}>AgentStream</div>
               </div>
-              <div style={{ color: '#10b981', fontSize: '24px', fontWeight: 900 }}>➔</div>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '30px' }}>⚡</div>
-                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700 }}>Your Server</div>
+              <ArrowRight size={22} color="#10b981" strokeWidth={2.5} />
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Server size={32} color="#10b981" />
+                <div style={{ color: '#e2e8f0', fontSize: '13px', fontWeight: 700, marginTop: '4px' }}>Your Server</div>
                 <div style={{ color: '#10b981', fontSize: '11px' }}>WebSocket</div>
               </div>
             </div>
@@ -611,9 +640,8 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* 3 Step Cards */}
+            {/* 3 Step Cards with Vector Category Icons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {/* Step 1 */}
               <div
                 style={{
                   padding: '14px 18px',
@@ -629,20 +657,19 @@ export const PhoneHUD: React.FC = () => {
                   style={{
                     backgroundColor: '#3b82f6',
                     color: '#fff',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
+                    borderRadius: '10px',
+                    width: '36px',
+                    height: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 900,
                   }}
                 >
-                  1
+                  <Mic size={20} color="#fff" strokeWidth={2.4} />
                 </div>
                 <div>
                   <div style={{ color: '#fff', fontWeight: 800, fontSize: '16px' }}>
-                    Speech-to-Text (STT)
+                    1. Speech-to-Text (STT)
                   </div>
                   <div style={{ color: '#93c5fd', fontSize: '13px' }}>
                     Sarvam Saaras (Hindi + English Streaming)
@@ -650,7 +677,6 @@ export const PhoneHUD: React.FC = () => {
                 </div>
               </div>
 
-              {/* Step 2 */}
               <div
                 style={{
                   padding: '14px 18px',
@@ -666,20 +692,19 @@ export const PhoneHUD: React.FC = () => {
                   style={{
                     backgroundColor: '#8b5cf6',
                     color: '#fff',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
+                    borderRadius: '10px',
+                    width: '36px',
+                    height: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 900,
                   }}
                 >
-                  2
+                  <Brain size={20} color="#fff" strokeWidth={2.4} />
                 </div>
                 <div>
                   <div style={{ color: '#fff', fontWeight: 800, fontSize: '16px' }}>
-                    Language Model (LLM)
+                    2. Language Model (LLM)
                   </div>
                   <div style={{ color: '#c4b5fd', fontSize: '13px' }}>
                     Context Reasoning + Tool Calling (Calendar)
@@ -687,7 +712,6 @@ export const PhoneHUD: React.FC = () => {
                 </div>
               </div>
 
-              {/* Step 3 */}
               <div
                 style={{
                   padding: '14px 18px',
@@ -703,20 +727,19 @@ export const PhoneHUD: React.FC = () => {
                   style={{
                     backgroundColor: '#10b981',
                     color: '#fff',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
+                    borderRadius: '10px',
+                    width: '36px',
+                    height: '36px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 900,
                   }}
                 >
-                  3
+                  <Volume2 size={20} color="#fff" strokeWidth={2.4} />
                 </div>
                 <div>
                   <div style={{ color: '#fff', fontWeight: 800, fontSize: '16px' }}>
-                    Text-to-Speech (TTS)
+                    3. Text-to-Speech (TTS)
                   </div>
                   <div style={{ color: '#6ee7b7', fontSize: '13px' }}>
                     Sarvam Bulbul / ElevenLabs Low Latency
@@ -725,7 +748,6 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Orchestrator Badge */}
             <div
               style={{
                 textAlign: 'center',
@@ -778,7 +800,6 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Engineering Grid */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div
                 style={{
@@ -786,13 +807,19 @@ export const PhoneHUD: React.FC = () => {
                   borderRadius: '18px',
                   backgroundColor: 'rgba(236, 72, 153, 0.12)',
                   border: '1px solid #ec4899',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
                 }}
               >
-                <div style={{ color: '#f472b6', fontWeight: 800, fontSize: '16px' }}>
-                  ⚡ Sub-Second Latency
-                </div>
-                <div style={{ color: '#e2e8f0', fontSize: '14px', marginTop: '4px' }}>
-                  Humans leave &lt; 300ms between conversation turns.
+                <Timer size={24} color="#f472b6" style={{ marginTop: '2px' }} />
+                <div>
+                  <div style={{ color: '#f472b6', fontWeight: 800, fontSize: '16px' }}>
+                    Sub-Second Latency
+                  </div>
+                  <div style={{ color: '#e2e8f0', fontSize: '14px', marginTop: '2px' }}>
+                    Humans leave &lt; 300ms between conversation turns.
+                  </div>
                 </div>
               </div>
 
@@ -802,13 +829,19 @@ export const PhoneHUD: React.FC = () => {
                   borderRadius: '18px',
                   backgroundColor: 'rgba(245, 158, 11, 0.12)',
                   border: '1px solid #f59e0b',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
                 }}
               >
-                <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '16px' }}>
-                  🛑 Barge-In Interruption
-                </div>
-                <div style={{ color: '#e2e8f0', fontSize: '14px', marginTop: '4px' }}>
-                  AI must cut voice immediately when caller speaks.
+                <Radio size={24} color="#fbbf24" style={{ marginTop: '2px' }} />
+                <div>
+                  <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '16px' }}>
+                    Barge-In Interruption
+                  </div>
+                  <div style={{ color: '#e2e8f0', fontSize: '14px', marginTop: '2px' }}>
+                    AI must cut voice immediately when caller speaks.
+                  </div>
                 </div>
               </div>
 
@@ -818,13 +851,19 @@ export const PhoneHUD: React.FC = () => {
                   borderRadius: '18px',
                   backgroundColor: 'rgba(99, 102, 241, 0.12)',
                   border: '1px solid #6366f1',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '12px',
                 }}
               >
-                <div style={{ color: '#a5b4fc', fontWeight: 800, fontSize: '16px' }}>
-                  📞 Noisy 8 kHz Telephone Audio
-                </div>
-                <div style={{ color: '#e2e8f0', fontSize: '14px', marginTop: '4px' }}>
-                  Preserve context &amp; graceful human handover.
+                <Activity size={24} color="#a5b4fc" style={{ marginTop: '2px' }} />
+                <div>
+                  <div style={{ color: '#a5b4fc', fontWeight: 800, fontSize: '16px' }}>
+                    Noisy 8 kHz Telephone Audio
+                  </div>
+                  <div style={{ color: '#e2e8f0', fontSize: '14px', marginTop: '2px' }}>
+                    Preserve context &amp; graceful human handover.
+                  </div>
                 </div>
               </div>
             </div>
@@ -868,7 +907,6 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Smart Assistant Glass Cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div
                 style={{
@@ -876,13 +914,19 @@ export const PhoneHUD: React.FC = () => {
                   backgroundColor: 'rgba(168, 85, 247, 0.15)',
                   border: '1px solid #a855f7',
                   borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
                 }}
               >
-                <div style={{ color: '#d8b4fe', fontWeight: 800, fontSize: '15px' }}>
-                  📅 Google Calendar
-                </div>
-                <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '16px' }}>
-                  Meeting Booked: Tomorrow 4:00 PM
+                <Calendar size={22} color="#d8b4fe" />
+                <div>
+                  <div style={{ color: '#d8b4fe', fontWeight: 800, fontSize: '14px' }}>
+                    Google Calendar
+                  </div>
+                  <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '16px' }}>
+                    Meeting Booked: Tomorrow 4:00 PM
+                  </div>
                 </div>
               </div>
 
@@ -892,13 +936,19 @@ export const PhoneHUD: React.FC = () => {
                   backgroundColor: 'rgba(59, 130, 246, 0.15)',
                   border: '1px solid #3b82f6',
                   borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
                 }}
               >
-                <div style={{ color: '#93c5fd', fontWeight: 800, fontSize: '15px' }}>
-                  💬 Auto-Summary Sent
-                </div>
-                <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '16px' }}>
-                  Caller: &quot;Needs contract updated by Friday&quot;
+                <MessageSquareQuote size={22} color="#93c5fd" />
+                <div>
+                  <div style={{ color: '#93c5fd', fontWeight: 800, fontSize: '14px' }}>
+                    Auto-Summary Sent
+                  </div>
+                  <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '16px' }}>
+                    Caller: &quot;Needs contract updated by Friday&quot;
+                  </div>
                 </div>
               </div>
 
@@ -908,13 +958,19 @@ export const PhoneHUD: React.FC = () => {
                   backgroundColor: 'rgba(16, 185, 129, 0.15)',
                   border: '1px solid #10b981',
                   borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
                 }}
               >
-                <div style={{ color: '#6ee7b7', fontWeight: 800, fontSize: '15px' }}>
-                  🔗 Model Context Protocol (MCP)
-                </div>
-                <div style={{ color: '#ffffff', fontSize: '14px' }}>
-                  Direct tool integration with owner&apos;s digital life
+                <Network size={22} color="#6ee7b7" />
+                <div>
+                  <div style={{ color: '#6ee7b7', fontWeight: 800, fontSize: '14px' }}>
+                    Model Context Protocol (MCP)
+                  </div>
+                  <div style={{ color: '#ffffff', fontSize: '14px' }}>
+                    Direct tool integration with owner&apos;s digital life
+                  </div>
                 </div>
               </div>
             </div>
@@ -925,7 +981,7 @@ export const PhoneHUD: React.FC = () => {
           </div>
         )}
 
-        {/* CHAPTER 8: OUTRO */}
+        {/* CHAPTER 8: OUTRO (RE-ENGINEERED FOR SENDS PER REACH) */}
         {chapter.id === 'outro' && (
           <div
             style={{
@@ -941,18 +997,18 @@ export const PhoneHUD: React.FC = () => {
               <div
                 style={{
                   color: '#00f0ff',
-                  fontSize: '16px',
+                  fontSize: '14px',
                   fontWeight: 900,
                   letterSpacing: '3px',
-                  marginBottom: '10px',
+                  marginBottom: '8px',
                 }}
               >
-                THE BIG QUESTION
+                THE ARCHITECTURE VERDICT
               </div>
               <div
                 style={{
                   color: '#ffffff',
-                  fontSize: '32px',
+                  fontSize: '30px',
                   fontWeight: 900,
                   lineHeight: '1.2',
                 }}
@@ -961,34 +1017,68 @@ export const PhoneHUD: React.FC = () => {
               </div>
             </div>
 
-            {/* Interactive Poll Cards */}
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {/* Send-Prompt Favor Card (Viral Metric Lever) */}
+            <div
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                borderRadius: '22px',
+                backgroundColor: 'rgba(0, 240, 255, 0.12)',
+                border: '1.5px solid #00f0ff',
+                boxShadow: '0 0 25px rgba(0, 240, 255, 0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                textAlign: 'left',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Share2 size={20} color="#00f0ff" />
+                <span style={{ color: '#00f0ff', fontWeight: 900, fontSize: '15px', letterSpacing: '0.5px' }}>
+                  SEND THIS TO AN ANDROID DEV
+                </span>
+              </div>
+              <div style={{ color: '#e2e8f0', fontSize: '14px', lineHeight: '1.4' }}>
+                Save them months of fighting <strong>CAPTURE_AUDIO_OUTPUT</strong> &amp; Google Play policies.
+              </div>
+            </div>
+
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div
                 style={{
-                  padding: '16px',
-                  borderRadius: '18px',
+                  padding: '14px',
+                  borderRadius: '16px',
                   background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.25), rgba(0, 240, 255, 0.25))',
-                  border: '2px solid #00f0ff',
+                  border: '1px solid #00f0ff',
                   color: '#ffffff',
-                  fontWeight: 900,
-                  fontSize: '20px',
-                  boxShadow: '0 0 25px rgba(0, 240, 255, 0.3)',
+                  fontWeight: 800,
+                  fontSize: '17px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
                 }}
               >
-                🔥 YES, Automate My Calls!
+                <CheckCircle2 size={20} color="#00f0ff" />
+                <span>YES, Automate My Calls!</span>
               </div>
               <div
                 style={{
-                  padding: '16px',
-                  borderRadius: '18px',
+                  padding: '14px',
+                  borderRadius: '16px',
                   background: 'linear-gradient(90deg, rgba(239, 68, 68, 0.25), rgba(245, 158, 11, 0.25))',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
                   color: '#ffffff',
-                  fontWeight: 900,
-                  fontSize: '20px',
+                  fontWeight: 800,
+                  fontSize: '17px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
                 }}
               >
-                🛑 NO, Too Personal / Risky!
+                <XCircle size={20} color="#f87171" />
+                <span>NO, Too Personal / Risky!</span>
               </div>
             </div>
 
@@ -996,21 +1086,21 @@ export const PhoneHUD: React.FC = () => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                padding: '12px 24px',
+                gap: '10px',
+                padding: '10px 20px',
                 borderRadius: '30px',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
                 border: '1px solid rgba(255, 255, 255, 0.2)',
               }}
             >
-              <span style={{ fontSize: '24px' }}>💬</span>
-              <span style={{ color: '#00f0ff', fontWeight: 800, fontSize: '18px' }}>
-                Drop it in the comments below!
+              <MessageCircle size={20} color="#00f0ff" />
+              <span style={{ color: '#00f0ff', fontWeight: 800, fontSize: '16px' }}>
+                Drop your thoughts in comments!
               </span>
             </div>
 
             <div style={{ width: '100%' }}>
-              <AudioVisualizer color="#00f0ff" barCount={28} height={45} />
+              <AudioVisualizer color="#00f0ff" barCount={28} height={40} />
             </div>
           </div>
         )}

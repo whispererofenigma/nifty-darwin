@@ -6,8 +6,8 @@ export const chapters: ChapterInfo[] = [
     number: '01/08',
     title: 'THE AI CALLING DREAM',
     tag: 'HOOK',
-    startFrame: 0,
-    endFrame: 450,
+    startSec: 0,
+    endSec: 15,
     accentColor: '#00f0ff',
   },
   {
@@ -15,8 +15,8 @@ export const chapters: ChapterInfo[] = [
     number: '02/08',
     title: 'THE ANDROID SECURITY WALL',
     tag: 'SYSTEM RESTRICTION',
-    startFrame: 450,
-    endFrame: 3240,
+    startSec: 15,
+    endSec: 108,
     accentColor: '#ef4444',
   },
   {
@@ -24,8 +24,8 @@ export const chapters: ChapterInfo[] = [
     number: '03/08',
     title: 'TELECOM REGULATIONS & DLT',
     tag: 'REGULATORY BOUNDARY',
-    startFrame: 3240,
-    endFrame: 4440,
+    startSec: 108,
+    endSec: 148,
     accentColor: '#f59e0b',
   },
   {
@@ -33,8 +33,8 @@ export const chapters: ChapterInfo[] = [
     number: '04/08',
     title: 'CLOUD TELEPHONY ARCHITECTURE',
     tag: 'THE REAL SOLUTION',
-    startFrame: 4440,
-    endFrame: 6540,
+    startSec: 148,
+    endSec: 218,
     accentColor: '#10b981',
   },
   {
@@ -42,8 +42,8 @@ export const chapters: ChapterInfo[] = [
     number: '05/08',
     title: 'THE 3-STAGE VOICE PIPELINE',
     tag: 'CORE ENGINE',
-    startFrame: 6540,
-    endFrame: 8700,
+    startSec: 218,
+    endSec: 290,
     accentColor: '#3b82f6',
   },
   {
@@ -51,8 +51,8 @@ export const chapters: ChapterInfo[] = [
     number: '06/08',
     title: 'LATENCY, NOISE & BARGE-IN',
     tag: 'THE REAL ENGINEERING',
-    startFrame: 8700,
-    endFrame: 9840,
+    startSec: 290,
+    endSec: 328,
     accentColor: '#ec4899',
   },
   {
@@ -60,8 +60,8 @@ export const chapters: ChapterInfo[] = [
     number: '07/08',
     title: 'ANDROID 16 APP FUNCTIONS & MCP',
     tag: 'THE FUTURE',
-    startFrame: 9840,
-    endFrame: 11100,
+    startSec: 328,
+    endSec: 370,
     accentColor: '#a855f7',
   },
   {
@@ -69,15 +69,16 @@ export const chapters: ChapterInfo[] = [
     number: '08/08',
     title: 'WOULD YOU TRUST AN AI CALLER?',
     tag: 'YOUR THOUGHTS',
-    startFrame: 11100,
-    endFrame: 11701,
+    startSec: 370,
+    endSec: 390.034,
     accentColor: '#00f0ff',
   },
 ];
 
-export const getCurrentChapter = (frame: number): ChapterInfo => {
+export const getCurrentChapter = (frame: number, fps: number = 60): ChapterInfo => {
+  const currentSec = frame / fps;
   for (const ch of chapters) {
-    if (frame >= ch.startFrame && frame < ch.endFrame) {
+    if (currentSec >= ch.startSec && currentSec < ch.endSec) {
       return ch;
     }
   }

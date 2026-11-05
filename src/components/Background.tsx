@@ -2,20 +2,21 @@ import React from 'react';
 import {
   AbsoluteFill,
   Img,
-  Loop,
-  OffthreadVideo,
   interpolate,
   staticFile,
   useCurrentFrame,
+  useVideoConfig,
 } from 'remotion';
 import { getCurrentChapter } from '../chapters';
 
 export const Background: React.FC = () => {
   const frame = useCurrentFrame();
-  const chapter = getCurrentChapter(frame);
+  const { fps } = useVideoConfig();
+  const chapter = getCurrentChapter(frame, fps);
 
   // Smooth subtle slow pan / zoom
-  const scale = interpolate(frame % 900, [0, 900], [1.0, 1.08]);
+  const loopFrames = fps * 30; // 30s cycle
+  const scale = interpolate(frame % loopFrames, [0, loopFrames], [1.0, 1.08]);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#070a12', overflow: 'hidden' }}>

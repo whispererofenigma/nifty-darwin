@@ -23,7 +23,7 @@ export interface ChapterInfo {
   number: string;
   title: string;
   tag: string;
-  startFrame: number;
-  endFrame: number;
+  startSec: number;
+  endSec: number;
   accentColor: string;
 }

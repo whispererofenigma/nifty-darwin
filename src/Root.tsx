@@ -6,22 +6,22 @@ import { PhoneAIAgentHook } from './PhoneAIAgentHook';
 export const Root: React.FC = () => {
   return (
     <>
-      {/* Full 6m30s In-Depth Master Instagram Reel */}
+      {/* Full 6m 30s Master Instagram Reel @ 60 FPS (23,402 frames) */}
       <Composition
         id="PhoneAIAgentReel"
         component={PhoneAIAgentReel}
-        durationInFrames={11701}
-        fps={30}
+        durationInFrames={23402}
+        fps={60}
         width={1080}
         height={1920}
       />
 
-      {/* 60s Fast Hook Viral Reel */}
+      {/* 60s Fast Hook Viral Reel @ 60 FPS (3,600 frames) */}
       <Composition
         id="PhoneAIAgentHook"
         component={PhoneAIAgentHook}
-        durationInFrames={1800}
-        fps={30}
+        durationInFrames={3600}
+        fps={60}
         width={1080}
         height={1920}
       />

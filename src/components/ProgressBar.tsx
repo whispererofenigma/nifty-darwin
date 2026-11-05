@@ -5,7 +5,7 @@ import { getCurrentChapter } from '../chapters';
 export const ProgressBar: React.FC = () => {
   const frame = useCurrentFrame();
   const { durationInFrames, fps } = useVideoConfig();
-  const chapter = getCurrentChapter(frame);
+  const chapter = getCurrentChapter(frame, fps);
 
   const progress = interpolate(frame, [0, durationInFrames], [0, 100], {
     extrapolateRight: 'clamp',

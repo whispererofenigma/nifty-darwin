@@ -1,5 +1,5 @@
 import React from 'react';
-import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
+import { spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { SubtitleCue } from '../types';
 import { subtitles } from '../subtitles';
 
@@ -47,21 +47,27 @@ export const SubtitlesOverlay: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // Find active cue
+  const currentSec = frame / fps;
+
+  // Find active cue by time
   const activeCue: SubtitleCue | undefined = subtitles.find(
-    (cue) => frame >= cue.startFrame && frame <= cue.endFrame
+    (cue) => currentSec >= cue.startSec && currentSec <= cue.endSec
   );
 
   if (!activeCue) {
     return null;
   }
 
-  const cueDuration = Math.max(1, activeCue.endFrame - activeCue.startFrame);
-  const progressInCue = (frame - activeCue.startFrame) / cueDuration;
+  const cueDuration = Math.max(0.1, activeCue.endSec - activeCue.startSec);
+  const progressInCue = Math.min(
+    1.0,
+    Math.max(0, (currentSec - activeCue.startSec) / cueDuration)
+  );
 
-  // Spring pop-in for the active cue
+  // Spring pop-in for the active cue at current fps
+  const cueStartFrame = Math.round(activeCue.startSec * fps);
   const popSpring = spring({
-    frame: frame - activeCue.startFrame,
+    frame: frame - cueStartFrame,
     fps,
     config: { damping: 12, stiffness: 180 },
   });
