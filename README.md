@@ -41,7 +41,29 @@ A high-engagement, cinematic 9:16 vertical video (Instagram Reel / YouTube Short
 
 ---
 
-## 🚀 How to Run & Preview
+## ☁️ Cloud Rendering with GitHub Actions
+
+This repository includes an automated GitHub Actions cloud workflow ([.github/workflows/render.yml](file:///home/whispererofenigma/Documents/antigravity/nifty-darwin/.github/workflows/render.yml)) that builds and renders the Remotion video entirely in the cloud on GitHub-hosted runners (or your own self-hosted cloud instances).
+
+### How to Render on the Cloud:
+1. Navigate to the **Actions** tab in your GitHub repository.
+2. Select **Build & Render Remotion Reel** from the left sidebar.
+3. Click **Run workflow**:
+   - **Composition**: Select `PhoneAIAgentHook` (60s viral reel) or `PhoneAIAgentReel` (full 6m30s master reel).
+   - **Concurrency**: Set thread concurrency (default `4`).
+   - **Frames** *(optional)*: Specify a frame range like `0-300` for test previews, or leave empty for the full video.
+4. Once completed, download the rendered high-definition MP4 directly from the **Artifacts** section of the run!
+
+### Dedicated Self-Hosted Cloud Runner (Optional)
+If you prefer to render on your own GPU/high-core cloud instance (e.g., AWS EC2, GCP, Oracle Cloud):
+```bash
+./scripts/setup-cloud-runner.sh
+```
+Follow the on-screen instructions to register the runner under **Settings ➔ Actions ➔ Runners**.
+
+---
+
+## 🚀 How to Run & Preview Locally
 
 ### 1. Interactive Remotion Studio (Realtime Preview & Scrubbing)
 ```bash
