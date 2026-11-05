@@ -1,0 +1,587 @@
+1
+00:00:00,000 --> 00:00:03,600
+What if an AI could answer your phone calls,
+
+2
+00:00:03,600 --> 00:00:05,500
+understand who's calling,
+
+3
+00:00:05,500 --> 00:00:09,200
+and actually have a conversation on your behalf?
+
+4
+00:00:09,200 --> 00:00:11,700
+That's the idea we're chasing.
+
+5
+00:00:11,700 --> 00:00:15,600
+And on day one, we hit a wall.
+
+6
+00:00:15,600 --> 00:00:18,500
+First: what can't be done.
+
+7
+00:00:18,500 --> 00:00:20,400
+The obvious plan?
+
+8
+00:00:20,400 --> 00:00:22,800
+Build it inside an Android app.
+
+9
+00:00:22,800 --> 00:00:25,300
+Detect an incoming SIM call,
+
+10
+00:00:25,300 --> 00:00:27,200
+answer it automatically,
+
+11
+00:00:27,200 --> 00:00:29,900
+capture both sides of the conversation,
+
+12
+00:00:29,900 --> 00:00:32,800
+send that audio to an AI model,
+
+13
+00:00:32,800 --> 00:00:36,400
+and play the reply back to the caller.
+
+14
+00:00:36,400 --> 00:00:39,000
+On paper, it sounds simple.
+
+15
+00:00:39,000 --> 00:00:42,200
+Android does give developers call APIs.
+
+16
+00:00:42,200 --> 00:00:46,100
+CallScreeningService lets an app identify an incoming call
+
+17
+00:00:46,100 --> 00:00:49,400
+and allow, silence, or reject it.
+
+18
+00:00:49,400 --> 00:00:52,600
+InCallService gives a default dialer its call interface
+
+19
+00:00:52,600 --> 00:00:54,700
+and call management.
+
+20
+00:00:54,700 --> 00:00:57,900
+But neither one hands a normal app the actual audio
+
+21
+00:00:57,900 --> 00:01:00,800
+of a cellular call.
+
+22
+00:01:00,800 --> 00:01:04,500
+Android does define audio sources for exactly that:
+
+23
+00:01:04,500 --> 00:01:07,700
+VOICE_UPLINK, VOICE_DOWNLINK, VOICE_CALL.
+
+24
+00:01:07,700 --> 00:01:10,200
+But each one requires a permission called
+
+25
+00:01:10,200 --> 00:01:12,600
+CAPTURE_AUDIO_OUTPUT,
+
+26
+00:01:12,600 --> 00:01:15,600
+and that permission is reserved for system components.
+
+27
+00:01:15,600 --> 00:01:18,700
+It is not available to third-party apps.
+
+28
+00:01:18,700 --> 00:01:21,000
+There was a workaround.
+
+29
+00:01:21,000 --> 00:01:24,300
+Android 10 blocked call recording by default,
+
+30
+00:01:24,300 --> 00:01:26,600
+so apps started using the Accessibility Service
+
+31
+00:01:26,600 --> 00:01:28,700
+to get around it.
+
+32
+00:01:28,700 --> 00:01:32,800
+And in 2022, Google Play shut that door too.
+
+33
+00:01:32,800 --> 00:01:35,700
+Its policy says the Accessibility API
+
+34
+00:01:35,700 --> 00:01:38,400
+is not for recording call audio.
+
+35
+00:01:38,400 --> 00:01:40,900
+Google Play also restricts the call log
+
+36
+00:01:40,900 --> 00:01:42,800
+and SMS permissions.
+
+37
+00:01:42,800 --> 00:01:45,400
+Only apps that are the default phone, SMS,
+
+38
+00:01:45,400 --> 00:01:48,300
+or assistant app can use them.
+
+39
+00:01:48,300 --> 00:01:51,200
+Then India adds another layer.
+
+40
+00:01:51,200 --> 00:01:54,500
+TRAI's rules for commercial communication require businesses
+
+41
+00:01:54,500 --> 00:01:57,800
+to register on the DLT platform and to use designated
+
+42
+00:01:57,800 --> 00:02:00,000
+number series:
+
+43
+00:02:00,000 --> 00:02:02,800
+140 for promotional calls,
+
+44
+00:02:02,800 --> 00:02:06,100
+1600 for service and transactional calls.
+
+45
+00:02:06,100 --> 00:02:09,100
+Ordinary 10-digit numbers are out.
+
+46
+00:02:09,100 --> 00:02:11,900
+Those rules are aimed at commercial calling,
+
+47
+00:02:11,900 --> 00:02:14,200
+but they show how closely India watches numbers,
+
+48
+00:02:14,200 --> 00:02:17,500
+telecom resources, and automated voices.
+
+49
+00:02:17,500 --> 00:02:20,800
+So this isn't a bug waiting for a clever fix.
+
+50
+00:02:20,800 --> 00:02:22,800
+It's a boundary
+
+51
+00:02:22,800 --> 00:02:25,800
+set by the operating system, the app store,
+
+52
+00:02:25,800 --> 00:02:28,800
+and the telecom network itself.
+
+53
+00:02:28,800 --> 00:02:32,000
+Now: what can be done, today.
+
+54
+00:02:32,000 --> 00:02:34,800
+If the audio can't come out of the phone,
+
+55
+00:02:34,800 --> 00:02:37,200
+the call has to arrive somewhere else.
+
+56
+00:02:37,200 --> 00:02:40,500
+An authorized cloud telephony provider can receive the call
+
+57
+00:02:40,500 --> 00:02:43,000
+on its own infrastructure.
+
+58
+00:02:43,000 --> 00:02:45,900
+The owner's number can forward calls to it,
+
+59
+00:02:45,900 --> 00:02:48,300
+for example when they're busy, unanswered,
+
+60
+00:02:48,300 --> 00:02:50,400
+or unreached.
+
+61
+00:02:50,400 --> 00:02:53,400
+Take Exotel, an Indian cloud telephony provider.
+
+62
+00:02:53,400 --> 00:02:55,700
+When a call is answered,
+
+63
+00:02:55,700 --> 00:02:58,600
+its AgentStream service opens a WebSocket
+
+64
+00:02:58,600 --> 00:03:00,800
+to your server
+
+65
+00:03:00,800 --> 00:03:03,800
+and streams the caller's audio as raw PCM,
+
+66
+00:03:03,800 --> 00:03:07,000
+in chunks of about 100 milliseconds.
+
+67
+00:03:07,000 --> 00:03:09,800
+It's telephone-quality audio: 8 kHz.
+
+68
+00:03:09,800 --> 00:03:13,000
+With its VoiceBot setup, the connection is two-way.
+
+69
+00:03:13,000 --> 00:03:15,700
+Your server sends audio back on the same socket,
+
+70
+00:03:15,700 --> 00:03:18,000
+and the caller hears it.
+
+71
+00:03:18,000 --> 00:03:20,500
+And here's a detail that matters:
+
+72
+00:03:20,500 --> 00:03:23,100
+the provider only relays the audio.
+
+73
+00:03:23,100 --> 00:03:25,900
+It does not do speech recognition
+
+74
+00:03:25,900 --> 00:03:28,200
+or voice generation.
+
+75
+00:03:28,200 --> 00:03:30,900
+That part is ours.
+
+76
+00:03:30,900 --> 00:03:33,900
+So the pipeline has three jobs.
+
+77
+00:03:33,900 --> 00:03:36,400
+First: speech-to-text.
+
+78
+00:03:36,400 --> 00:03:39,500
+A streaming recognizer turns the caller's audio into text
+
+79
+00:03:39,500 --> 00:03:41,900
+while they're still talking.
+
+80
+00:03:41,900 --> 00:03:45,300
+Sarvam offers this with its Saaras models,
+
+81
+00:03:45,300 --> 00:03:47,800
+built for Indian languages with support
+
+82
+00:03:47,800 --> 00:03:51,500
+for switching between languages like Hindi and English.
+
+83
+00:03:51,500 --> 00:03:54,200
+Second: the language model.
+
+84
+00:03:54,200 --> 00:03:56,900
+It takes the transcript and the conversation so far,
+
+85
+00:03:56,900 --> 00:03:59,300
+works out what the caller wants,
+
+86
+00:03:59,300 --> 00:04:01,800
+decides what to say,
+
+87
+00:04:01,800 --> 00:04:05,300
+and can call authorized tools, like a calendar.
+
+88
+00:04:05,300 --> 00:04:07,800
+Third: text-to-speech.
+
+89
+00:04:07,800 --> 00:04:10,700
+Bulbul from Sarvam, or ElevenLabs,
+
+90
+00:04:10,700 --> 00:04:13,300
+turns the reply into audio that goes straight back
+
+91
+00:04:13,300 --> 00:04:15,600
+down the same connection.
+
+92
+00:04:15,600 --> 00:04:19,200
+Wiring all of this together is the orchestration layer.
+
+93
+00:04:19,200 --> 00:04:21,500
+Vapi is a hosted platform
+
+94
+00:04:21,500 --> 00:04:23,800
+where you plug in your own speech, language,
+
+95
+00:04:23,800 --> 00:04:25,900
+and voice providers,
+
+96
+00:04:25,900 --> 00:04:28,400
+and it handles turn-taking, interruptions,
+
+97
+00:04:28,400 --> 00:04:30,600
+and tool calls.
+
+98
+00:04:30,600 --> 00:04:32,800
+Or you build it yourself
+
+99
+00:04:32,800 --> 00:04:35,700
+with open-source frameworks like Pipecat
+
+100
+00:04:35,700 --> 00:04:38,200
+or a custom Node.js layer.
+
+101
+00:04:38,200 --> 00:04:41,700
+Sarvam's own documentation even walks through a phone voice agent
+
+102
+00:04:41,700 --> 00:04:45,400
+built from Exotel, Pipecat, and Sarvam.
+
+103
+00:04:45,400 --> 00:04:49,700
+But a working pipeline is not a good phone agent.
+
+104
+00:04:49,700 --> 00:04:52,900
+People leave only a fraction of a second between turns.
+
+105
+00:04:52,900 --> 00:04:55,700
+Every step in this chain—the network,
+
+106
+00:04:55,700 --> 00:04:59,600
+the recognizer, the model, the voice—adds delay.
+
+107
+00:04:59,600 --> 00:05:02,800
+Interruptions—what engineers call "barge-in"—
+
+108
+00:05:02,800 --> 00:05:05,900
+mean the AI must stop talking the instant the caller starts.
+
+109
+00:05:05,900 --> 00:05:09,100
+Phone lines are noisy and narrow. Connections drop.
+
+110
+00:05:09,100 --> 00:05:12,100
+Context has to survive the whole call,
+
+111
+00:05:12,100 --> 00:05:15,300
+and the AI has to know when to step back
+
+112
+00:05:15,300 --> 00:05:17,500
+and hand over to a human.
+
+113
+00:05:17,500 --> 00:05:21,200
+That's the real engineering.
+
+114
+00:05:21,200 --> 00:05:23,800
+So, what do we intend to do?
+
+115
+00:05:23,800 --> 00:05:26,600
+The goal is not another IVR,
+
+116
+00:05:26,600 --> 00:05:29,800
+not a menu that plays pre-recorded options.
+
+117
+00:05:29,800 --> 00:05:32,600
+It's a personal agent that understands
+
+118
+00:05:32,600 --> 00:05:35,200
+who's calling and why,
+
+119
+00:05:35,200 --> 00:05:37,700
+keeps context, answers questions,
+
+120
+00:05:37,700 --> 00:05:40,500
+takes a message, or checks your availability
+
+121
+00:05:40,500 --> 00:05:42,500
+and books a time—
+
+122
+00:05:42,500 --> 00:05:45,900
+all with the owner's permission.
+
+123
+00:05:45,900 --> 00:05:49,300
+The first milestone is a working cloud-based phone agent.
+
+124
+00:05:49,300 --> 00:05:52,400
+The bigger ambition is making it work
+
+125
+00:05:52,400 --> 00:05:55,200
+with the phone people already use.
+
+126
+00:05:55,200 --> 00:05:58,800
+And Android may still have a role.
+
+127
+00:05:58,800 --> 00:06:01,800
+App Functions is an Android platform API
+
+128
+00:06:01,800 --> 00:06:04,100
+with a Jetpack library
+
+129
+00:06:04,100 --> 00:06:07,300
+that lets an app expose its features as tools for AI agents.
+
+130
+00:06:07,300 --> 00:06:09,800
+Think of it as the mobile counterpart
+
+131
+00:06:09,800 --> 00:06:12,600
+to Model Context Protocol (MCP),
+
+132
+00:06:12,600 --> 00:06:15,600
+which connects agents to outside services.
+
+133
+00:06:15,600 --> 00:06:18,500
+App Functions needs Android 16 or higher,
+
+134
+00:06:18,500 --> 00:06:20,900
+and it's still early days.
+
+135
+00:06:20,900 --> 00:06:23,800
+They won't unlock cellular call audio,
+
+136
+00:06:23,800 --> 00:06:26,700
+but they could connect the agent to the rest
+
+137
+00:06:26,700 --> 00:06:29,200
+of the owner's digital life:
+
+138
+00:06:29,200 --> 00:06:33,100
+calendar, messages, notes, tasks.
+
+139
+00:06:33,100 --> 00:06:35,500
+We're not there yet.
+
+140
+00:06:35,500 --> 00:06:38,400
+This is where we're starting.
+
+141
+00:06:38,400 --> 00:06:40,900
+Now I want to know:
+
+142
+00:06:40,900 --> 00:06:44,500
+would you let an AI answer your phone calls for you?
+
+143
+00:06:44,500 --> 00:06:47,700
+Or is that a line you won't cross?
+
+144
+00:06:47,700 --> 00:06:50,500
+And if you've fought with Android telephony
+
+145
+00:06:50,500 --> 00:06:53,400
+or voice AI yourself,
+
+146
+00:06:53,400 --> 00:06:55,700
+tell me what I'm missing.
+
+147
+00:06:55,700 --> 00:06:58,500
+Drop it in the comments.

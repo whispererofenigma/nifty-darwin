@@ -1,0 +1,6 @@
+node_modules/
+out/
+preview_frames/
+.env
+.DS_Store
+*.log

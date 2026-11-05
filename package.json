@@ -1,0 +1,29 @@
+{
+  "name": "nifty-darwin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "remotion preview src/index.ts",
+    "build": "remotion bundle src/index.ts",
+    "render": "remotion render src/index.ts PhoneAIAgentReel out/phone_ai_agent_reel.mp4",
+    "render:hook": "remotion render src/index.ts PhoneAIAgentHook out/phone_ai_agent_hook.mp4"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/cli": "^4.0.260",
+    "@remotion/media-utils": "^4.0.260",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "lucide-react": "^1.67.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.260"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

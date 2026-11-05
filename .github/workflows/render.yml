@@ -1,0 +1,98 @@
+name: Build & Render Remotion Reel
+
+on:
+  workflow_dispatch:
+    inputs:
+      composition:
+        description: 'Remotion Composition to render'
+        required: true
+        default: 'PhoneAIAgentHook'
+        type: choice
+        options:
+          - PhoneAIAgentHook
+          - PhoneAIAgentReel
+      concurrency:
+        description: 'CPU render concurrency'
+        required: false
+        default: '4'
+      frames:
+        description: 'Specific frame range (e.g. 0-300) or empty for full composition'
+        required: false
+        default: ''
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  render:
+    name: Render Reel on Cloud Runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install System Dependencies for Remotion & Chromium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ffmpeg \
+            fonts-noto-color-emoji \
+            fonts-roboto \
+            fonts-freefont-ttf \
+            libnss3 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2t64 || sudo apt-get install -y libasound2
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Verify TypeScript compilation
+        run: npx tsc --noEmit
+
+      - name: Determine Render Configuration
+        id: config
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "COMPOSITION=${{ github.event.inputs.composition }}" >> $GITHUB_ENV
+            echo "CONCURRENCY=${{ github.event.inputs.concurrency }}" >> $GITHUB_ENV
+            if [ -n "${{ github.event.inputs.frames }}" ]; then
+              echo "FRAMES_ARG=--frames=${{ github.event.inputs.frames }}" >> $GITHUB_ENV
+            else
+              echo "FRAMES_ARG=" >> $GITHUB_ENV
+            fi
+          else
+            # Default for push triggers: render the 60s viral hook reel
+            echo "COMPOSITION=PhoneAIAgentHook" >> $GITHUB_ENV
+            echo "CONCURRENCY=4" >> $GITHUB_ENV
+            echo "FRAMES_ARG=" >> $GITHUB_ENV
+          fi
+
+      - name: Render Remotion Video
+        run: |
+          mkdir -p out
+          echo "Rendering $COMPOSITION on GitHub Cloud Runner..."
+          npx remotion render src/index.ts "$COMPOSITION" "out/${COMPOSITION}.mp4" --concurrency="$CONCURRENCY" $FRAMES_ARG
+
+      - name: Upload Rendered Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.COMPOSITION }}-rendered-video
+          path: out/*.mp4
+          retention-days: 30
