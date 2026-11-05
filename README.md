@@ -1,6 +1,55 @@
-# Phone AI Agent — Instagram Reel (Remotion)
+# Phone AI Agent — 60 FPS Master Instagram Reel (Remotion)
 
-A high-engagement, cinematic 9:16 vertical video (Instagram Reel / YouTube Short / TikTok) generated with **Remotion**, AI-generated imagery, web-searched media, synthesized audio sound design, dynamic captions, and technical HUD graphics for the **Phone AI Agent** technical breakdown.
+[![GitHub Actions Workflow](https://img.shields.io/badge/GitHub_Actions-Cloud_Render_60FPS-blue?logo=github-actions)](https://github.com/whispererofenigma/nifty-darwin/actions)
+[![60 FPS Full Duration](https://img.shields.io/badge/Framerate-60_FPS_(23,402_Frames)-cyan)](https://github.com/whispererofenigma/nifty-darwin)
+[![Duration](https://img.shields.io/badge/Duration-06:30.03-purple)](https://github.com/whispererofenigma/nifty-darwin)
+
+A cinematic, ultra-smooth **60 FPS** 9:16 vertical video breakdown created with **Remotion**, AI-generated cyber visuals, vector iconography, kinetic captions, and sound design.
+
+Repository: **[https://github.com/whispererofenigma/nifty-darwin](https://github.com/whispererofenigma/nifty-darwin)**
+
+---
+
+## ⚡ 60 FPS Master Specifications
+
+- **Resolution**: `1080 x 1920` (9:16 Vertical Video)
+- **Framerate**: **60.0 FPS** (Ultra-smooth kinetic typography and interface animations)
+- **Total Duration**: `06m 30.03s` (**23,402 frames**)
+- **Vector Icons**: Replaced all emojis with Lucide vector icons (`Bot`, `Lock`, `ShieldCheck`, `Smartphone`, `Cloud`, `Server`, `Mic`, `Brain`, `Volume2`, `Timer`, `Share2`, `CheckCircle2`, `MessageCircle`).
+- **Sound-Off Viral Hook**: High-contrast headline overlay on the first 3.8 seconds (`CAN AI ANSWER YOUR PHONE CALLS?`) to beat the 3-second drop-off cliff.
+- **Sends-Per-Reach CTA**: End card re-engineered to prompt DM shares to developers and engineers.
+
+---
+
+## ☁️ How to Build & Render on GitHub Cloud
+
+Render the entire 60 FPS video directly in the cloud using GitHub Actions:
+
+1. Open **[https://github.com/whispererofenigma/nifty-darwin/actions](https://github.com/whispererofenigma/nifty-darwin/actions)**.
+2. Select **Build & Render 60FPS Remotion Reel (Cloud)**.
+3. Click **Run workflow**:
+   - **Rendering Strategy**:
+     - `parallel-cluster` *(Recommended)*: Spins up **4 parallel cloud runners** (chunks 0-3), renders simultaneously, and losslessly stitches them via FFmpeg into the master MP4.
+     - `single-runner`: Renders the full 23,402 frames sequentially on one machine.
+     - `hook-only`: Renders the 60-second teaser reel (3,600 frames) in ~5 minutes.
+   - **GitHub Runner Environment**:
+     - `ubuntu-latest` (Default, 4-core, 16GB RAM)
+     - `ubuntu-latest-8-cores` / `ubuntu-latest-16-cores` (High-spec runners)
+4. Once completed, download the master video file from the **Artifacts** section!
+
+---
+
+## 📋 Recommended Instagram Reel Caption (SEO & Send-Tuned)
+
+```text
+Building an AI phone agent: why Android won't let you record cellular calls.
+
+We tried building an AI assistant to answer calls on Android. On day one, we discovered CAPTURE_AUDIO_OUTPUT is locked to system apps, and the Accessibility API loophole got shut down in 2022. Here is how cloud telephony (Exotel + Sarvam) actually solves it.
+
+Send this to a developer or founder before they waste 3 months trying to build voice AI inside an Android app.
+
+#voiceai #androiddev #developer #artificialintelligence #tech
+```
 
 ---
 
